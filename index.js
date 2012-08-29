@@ -1,6 +1,5 @@
 var Stream = require('stream');
 var EventEmitter = require('events').EventEmitter;
-var through = require('through');
 
 module.exports = function (src) {
     var dst = null;
