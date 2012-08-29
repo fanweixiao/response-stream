@@ -9,7 +9,7 @@ var fs = require('fs');
 var fileContents = fs.readFileSync(__dirname + '/data.txt');
 
 test('filed response', function (t) {
-    t.plan(2);
+    t.plan(3);
     
     var port = Math.floor(Math.random() * 5e4 + 1e4);
     var server = http.createServer(function (req, res) {
@@ -35,6 +35,10 @@ test('filed response', function (t) {
                     Number(res.headers['content-length']),
                     fileContents.length
                 );
+                t.equal(
+                    res.headers['content-type'],
+                    'TEXT/PLAIN'
+                );
             });
         });
     });
@@ -47,6 +51,13 @@ test('filed response', function (t) {
         var s = responseStream(es.mapSync(function (s) {
             return String(s).toUpperCase()
         }));
+        
+        s.on('setHeader', function (args, pass) {
+            if (args[0] === 'content-type') {
+                args[1] = String(args[1]).toUpperCase();
+            }
+        });
+        
         return s;
     }
 });
