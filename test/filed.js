@@ -9,7 +9,7 @@ var fs = require('fs');
 var fileContents = fs.readFileSync(__dirname + '/data.txt');
 
 test('filed response', function (t) {
-    t.plan(3);
+    t.plan(4);
     
     var port = Math.floor(Math.random() * 5e4 + 1e4);
     var server = http.createServer(function (req, res) {
@@ -39,6 +39,7 @@ test('filed response', function (t) {
                     res.headers['content-type'],
                     'TEXT/PLAIN'
                 );
+                t.notOk(res.headers.etag);
             });
         });
     });
@@ -55,6 +56,9 @@ test('filed response', function (t) {
         s.on('setHeader', function (args, pass) {
             if (args[0] === 'content-type') {
                 args[1] = String(args[1]).toUpperCase();
+            }
+            if (args[0] === 'etag') {
+                pass();
             }
         });
         
