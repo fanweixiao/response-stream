@@ -1,5 +1,9 @@
-module.exports = function (stream) {
+var Stream = require('stream');
+var EventEmitter = require('events').EventEmitter;
+
+module.exports = function (src) {
     var dst = null;
+    var stream = copyStream(src);
     
     var pipe = stream.pipe;
     stream.pipe = function (target) {
@@ -49,3 +53,21 @@ module.exports = function (stream) {
     
     return stream;
 };
+
+function copyStream (src) {
+    var s = new Stream;
+    s.writable = true;
+    s.readable = true;
+    
+    var names = [
+        'write', 'end', 'destroy', 'pause', 'resume'
+    ].concat(Object.keys(EventEmitter.prototype));
+    
+    names.forEach(function (name) {
+        if (src[name] && typeof src[name] === 'function') {
+            s[name] = src[name].bind(src);
+        }
+    });
+    
+    return s;
+}
