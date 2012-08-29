@@ -5,6 +5,8 @@ Pass http server response methods through to the next destination pipe.
 This is useful if you want to write duplex streams that will be piped into an
 http server response (`.pipe(res)`).
 
+[![build status](https://secure.travis-ci.org/substack/response-stream.png)](http://travis-ci.org/substack/response-stream)
+
 # example
 
 ``` js
