@@ -9,7 +9,7 @@ var fs = require('fs');
 var fileContents = fs.readFileSync(__dirname + '/data.txt');
 
 test('filed response', function (t) {
-    t.plan(4);
+    t.plan(5);
     
     var port = Math.floor(Math.random() * 5e4 + 1e4);
     var server = http.createServer(function (req, res) {
@@ -49,9 +49,11 @@ test('filed response', function (t) {
     });
     
     function capStream () {
-        var s = responseStream(es.mapSync(function (s) {
+        var caps = es.mapSync(function (s) {
             return String(s).toUpperCase()
-        }));
+        });
+        var s = responseStream(caps);
+        t.notEqual(caps, s);
         
         s.on('setHeader', function (args, pass) {
             if (args[0] === 'content-type') {
