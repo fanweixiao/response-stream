@@ -1,5 +1,6 @@
 var Stream = require('stream');
 var EventEmitter = require('events').EventEmitter;
+var through = require('through');
 
 module.exports = function (src) {
     var dst = null;
@@ -59,15 +60,17 @@ function copyStream (src) {
     s.writable = true;
     s.readable = true;
     
-    var names = [
-        'write', 'end', 'destroy', 'pause', 'resume'
-    ].concat(Object.keys(EventEmitter.prototype));
+    [ 'write', 'end', 'destroy', 'pause', 'resume' ]
+        .forEach(function (name) {
+            if (src[name]) s[name] = src[name].bind(src);
+        })
+    ;
     
-    names.forEach(function (name) {
-        if (src[name] && typeof src[name] === 'function') {
-            s[name] = src[name].bind(src);
-        }
-    });
+    [ 'data', 'end', 'error', 'close', 'drain', 'pipe' ]
+        .forEach(function (name) {
+            src.on(name, s.emit.bind(s, name));
+        })
+    ;
     
     return s;
 }
