@@ -34,9 +34,15 @@ module.exports = function (stream) {
     ];
     methods.forEach(function (name) {
         stream[name] = function () {
-            stream.emit(name, arguments);
+            var prevented = false;
+            var prevent = function () { prevented = true };
+            stream.emit(name, arguments, prevent);
+            if (prevented) return;
             
             if (dst) return dst[name].apply(dst, arguments);
+            
+            // return codes can't work yet here because we don't have the
+            // response, but that should only matter for getHeader()
             proxied.push({ name : name, arguments : arguments });
         };
     });
